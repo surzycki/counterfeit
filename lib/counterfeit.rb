@@ -8,7 +8,6 @@ require 'counterfeit/blockchain/app'
 require 'counterfeit/dow_jones/app'
 require 'counterfeit/etherchain/app'
 require 'counterfeit/ledger/app'
-require 'counterfeit/mbtc/app'
 require 'counterfeit/nexmo/app'
 require 'counterfeit/slack/app'
 require 'counterfeit/ripple/app'
@@ -25,13 +24,19 @@ module Counterfeit
       Counterfeit::DowJones,
       Counterfeit::Etherchain,
       Counterfeit::Ledger,
-      Counterfeit::MBTC,
       Counterfeit::Nexmo,
       Counterfeit::Slack,
       Counterfeit::Ripple
     ]
   end
 
+  def self.logger
+    @logger ||= Logger.new(File.join(File.expand_path(__dir__), '../log/counterfeit'))
+  end
+
+  def self.logger=(logger)
+    @logger = logger
+  end
 
   def enable!(plugins=self.plugins)
     WebMock.allow_net_connect!
@@ -45,12 +50,10 @@ module Counterfeit
     end
   end
 
-
   def disable!
     WebMock.disable!
     WebMock.reset!
   end
-
 
   def webpack_dev_server?
     defined?(Webpacker) && Webpacker.dev_server.running?
@@ -81,3 +84,5 @@ module Counterfeit
     end
   end
 end
+
+require 'counterfeit/railtie' if defined?(::Rails::Railtie)
